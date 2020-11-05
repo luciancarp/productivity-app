@@ -1,0 +1,36 @@
+{
+  "name": "mern-template",
+  "version": "1.0.0",
+  "description": "mern project template",
+  "main": "server.js",
+  "scripts": {
+    "build": "tsc",
+    "client-install": "cd client/ && yarn install",
+    "client-build": "cd client/ && yarn run build",
+    "start": "node server.js",
+    "server": "concurrently \"tsc -w\" \"nodemon server.js\"",
+    "client": "cd client/ && yarn start",
+    "full-install": "yarn install && yarn client-install",
+    "dev": "concurrently \"tsc -w\" \"yarn server\" \"yarn client\""
+  },
+  "author": "Lucian Carp",
+  "license": "MIT",
+  "dependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/express": "^4.17.8",
+    "@types/jsonwebtoken": "^8.5.0",
+    "@types/mongoose": "^5.7.36",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-validator": "^6.6.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.10.9",
+    "typescript": "^4.0.3"
+  },
+  "tsc": "tsc",
+  "devDependencies": {
+    "concurrently": "^5.3.0",
+    "nodemon": "^2.0.5"
+  }
+}
