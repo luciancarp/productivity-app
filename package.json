@@ -2,13 +2,15 @@
   "name": "mern-template",
   "version": "1.0.0",
   "description": "mern project template",
-  "main": "server.js",
+  "main": "dist/src/server.js",
   "scripts": {
+    "test": "jest --coverage",
+    "test:watch": "jest --coverage --watchAll",
     "build": "tsc",
     "client-install": "cd client/ && yarn install",
     "client-build": "cd client/ && yarn run build",
-    "start": "node server.js",
-    "server": "concurrently \"tsc -w\" \"nodemon server.js\"",
+    "start": "tsc && node dist/server.js",
+    "server": "tsc && concurrently \"tsc -w\" \"nodemon dist/server.js\"",
     "client": "cd client/ && yarn start",
     "full-install": "yarn install && yarn client-install",
     "dev": "concurrently \"tsc -w\" \"yarn server\" \"yarn client\""
@@ -26,11 +28,14 @@
     "express-validator": "^6.6.1",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.10.9",
-    "typescript": "^4.0.3"
+    "typescript": "^4.2.4"
   },
   "tsc": "tsc",
   "devDependencies": {
+    "@types/jest": "^26.0.22",
     "concurrently": "^5.3.0",
-    "nodemon": "^2.0.5"
+    "jest": "^26.6.3",
+    "nodemon": "^2.0.5",
+    "ts-jest": "^26.5.5"
   }
 }
