@@ -36,6 +36,7 @@ router.post(
           .json({ errors: [{ msg: 'User already exists' }] })
       }
 
+      //TODO create user after hashing password
       user = new User({
         name,
         email,
