@@ -13,7 +13,7 @@ describe('Connection', () => {
     })
   })
 
-  test('can create, get, update and remove a user', async () => {
+  it('can create, get, update and remove a user', async () => {
     const testUser = {
       name: 'test',
       email: 'test@test.com',

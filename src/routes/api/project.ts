@@ -3,7 +3,7 @@ const router = express.Router()
 import { check, validationResult } from 'express-validator'
 import auth from '../../middleware/auth'
 
-import ProjectCtrl from '../../controllers/project.controller'
+import ProjectCtrl from '../../controllers/ProjectController'
 
 // @route  POST api/projects
 // @desc   Create project

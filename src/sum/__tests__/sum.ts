@@ -1,9 +1,9 @@
 import { sum } from '../sum'
 
-test('basic', () => {
+it('basic', () => {
   expect(sum()).toBe(0)
 })
 
-test('basic again', () => {
+it('basic again', () => {
   expect(sum(1, 2)).toBe(3)
 })
