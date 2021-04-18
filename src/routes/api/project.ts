@@ -3,7 +3,7 @@ const router = express.Router()
 import { check, validationResult } from 'express-validator'
 import auth from '../../middleware/auth'
 
-import ProjectCtrl from '../../controllers/ProjectController'
+import Controller from '../../controllers/ProjectController'
 
 // @route  POST api/projects
 // @desc   Create project
@@ -11,8 +11,8 @@ import ProjectCtrl from '../../controllers/ProjectController'
 router.post(
   '/',
   auth,
-  [check('title', 'Title is required').not().isEmpty()],
-  ProjectCtrl.apiCreateProject
+  Controller.validationCreateProject,
+  Controller.apiCreateProject
 )
 
 //TODO Change to private
@@ -20,6 +20,6 @@ router.post(
 // @route    GET api/project/:id
 // @desc     Get project by ID
 // @access   Public
-router.get('/:id', ProjectCtrl.apiGetProjectById)
+router.get('/:id', Controller.apiGetProjectById)
 
 module.exports = router

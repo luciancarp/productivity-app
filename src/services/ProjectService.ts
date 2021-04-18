@@ -1,7 +1,7 @@
 import { Schema } from 'mongoose'
 import Project from '../models/Project'
 
-export const getAllProjects = async () => {
+const getAllProjects = async () => {
   try {
     const allProjects = await Project.find()
     return allProjects
@@ -10,7 +10,7 @@ export const getAllProjects = async () => {
   }
 }
 
-export const createProject = async (data: {
+const createProject = async (data: {
   title: string
   user: Schema.Types.ObjectId
 }) => {
@@ -26,7 +26,7 @@ export const createProject = async (data: {
   }
 }
 
-export const getProjectbyId = async (projectId: string) => {
+const getProjectbyId = async (projectId: string) => {
   try {
     const singleProjectResponse = await Project.findById({ _id: projectId })
     return singleProjectResponse
@@ -37,7 +37,7 @@ export const getProjectbyId = async (projectId: string) => {
 
 //TODO updateProject
 
-export const deleteProject = async (projectId: string) => {
+const deleteProject = async (projectId: string) => {
   try {
     const deletedResponse = await Project.findOneAndDelete({ _id: projectId })
     return deletedResponse
