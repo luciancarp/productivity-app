@@ -22,6 +22,7 @@ const createProject = async (data: {
     const response = await new Project(newProject).save()
     return response
   } catch (error) {
+    //TODO add error msg
     console.log(error)
   }
 }
