@@ -1,6 +1,6 @@
 import { Types } from 'mongoose'
 import User from '../../models/User'
-import UserService from '../UserService'
+import UserService from '../user'
 
 describe('User Service', () => {
   it('creates a user', () => {

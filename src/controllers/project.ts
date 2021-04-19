@@ -1,14 +1,14 @@
-import ProjectService from '../services/ProjectService'
+import ProjectService from '../services/project'
 import { Request, Response } from 'express'
 import { check, validationResult } from 'express-validator'
 
 import User from '../models/User'
 
-const apiGetAllProjects = async (
-  req: Request,
-  res: Response,
-  next: Function
-) => {
+export const validationCreateProject = [
+  check('title', 'Title is required').not().isEmpty(),
+]
+
+const getAllProjects = async (req: Request, res: Response, next: Function) => {
   try {
     const projects = await ProjectService.getAllProjects()
     if (!projects) {
@@ -20,11 +20,7 @@ const apiGetAllProjects = async (
   }
 }
 
-const apiGetProjectById = async (
-  req: Request,
-  res: Response,
-  next: Function
-) => {
+const getProjectById = async (req: Request, res: Response, next: Function) => {
   try {
     let id = req.params.id || ''
     const project = await ProjectService.getProjectbyId(id)
@@ -34,15 +30,7 @@ const apiGetProjectById = async (
   }
 }
 
-const validationCreateProject = [
-  check('title', 'Title is required').not().isEmpty(),
-]
-
-const apiCreateProject = async (
-  req: Request,
-  res: Response,
-  next: Function
-) => {
+const createProject = async (req: Request, res: Response, next: Function) => {
   try {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
@@ -62,20 +50,16 @@ const apiCreateProject = async (
     }
 
     const createdProject = await ProjectService.createProject(newProject)
-    res.json(createdProject)
+    res.status(200).json(createdProject)
   } catch (error) {
     res.status(500).json({ error: error })
   }
 }
 
-//TODO apiUpdateProject
+//TODO UpdateProject
 
 //TODO verify user
-const apiDeleteProject = async (
-  req: Request,
-  res: Response,
-  next: Function
-) => {
+const deleteProject = async (req: Request, res: Response, next: Function) => {
   try {
     const projectId = req.params.id
     const deleteResponse = await ProjectService.deleteProject(projectId)
@@ -86,9 +70,8 @@ const apiDeleteProject = async (
 }
 
 export default {
-  apiGetAllProjects,
-  apiGetProjectById,
-  apiCreateProject,
-  validationCreateProject,
-  apiDeleteProject,
+  getAllProjects,
+  getProjectById,
+  createProject,
+  deleteProject,
 }

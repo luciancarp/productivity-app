@@ -1,16 +1,9 @@
-import mongoose from 'mongoose'
 import User from '../../models/User'
+import db from '../db'
 
 describe('Connection', () => {
   beforeAll(async () => {
-    const db: string = process.env.MONGO_URI_TEST || ''
-
-    await mongoose.connect(db, {
-      useUnifiedTopology: true,
-      useNewUrlParser: true,
-      useCreateIndex: true,
-      useFindAndModify: false,
-    })
+    await db.connect()
   })
 
   it('can create, get, update and remove a user', async () => {
@@ -37,7 +30,7 @@ describe('Connection', () => {
   })
 
   afterAll(async (done) => {
-    mongoose.disconnect()
+    await db.close()
     done()
   })
 })

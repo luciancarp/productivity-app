@@ -6,7 +6,7 @@ const getAllProjects = async () => {
     const allProjects = await Project.find()
     return allProjects
   } catch (error) {
-    console.log(`Could not fetch Projects ${error}`)
+    console.log(`Could not fetch Projects => ${error}`)
   }
 }
 
@@ -22,8 +22,7 @@ const createProject = async (data: {
     const response = await new Project(newProject).save()
     return response
   } catch (error) {
-    //TODO add error msg
-    console.log(error)
+    console.log(`Could not create Project => ${error}`)
   }
 }
 
@@ -32,7 +31,7 @@ const getProjectbyId = async (projectId: string) => {
     const singleProjectResponse = await Project.findById({ _id: projectId })
     return singleProjectResponse
   } catch (error) {
-    console.log(`Project not found. ${error}`)
+    console.log(`Could not fetch Project => ${error}`)
   }
 }
 
@@ -43,7 +42,7 @@ const deleteProject = async (projectId: string) => {
     const deletedResponse = await Project.findOneAndDelete({ _id: projectId })
     return deletedResponse
   } catch (error) {
-    console.log(`Could not delete Project ${error}`)
+    console.log(`Could not delete Project => ${error}`)
   }
 }
 

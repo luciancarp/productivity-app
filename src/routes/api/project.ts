@@ -1,25 +1,21 @@
-import express, { Request, Response } from 'express'
+import express from 'express'
 const router = express.Router()
-import { check, validationResult } from 'express-validator'
-import auth from '../../middleware/auth'
 
-import Controller from '../../controllers/ProjectController'
+import auth from '../../utils/auth'
+import ProjectController, {
+  validationCreateProject,
+} from '../../controllers/project'
 
 // @route  POST api/projects
 // @desc   Create project
 // @access Private
-router.post(
-  '/',
-  auth,
-  Controller.validationCreateProject,
-  Controller.apiCreateProject
-)
+router.post('/', auth, validationCreateProject, ProjectController.createProject)
 
 //TODO Change to private
 
 // @route    GET api/project/:id
 // @desc     Get project by ID
 // @access   Public
-router.get('/:id', Controller.apiGetProjectById)
+router.get('/:id', ProjectController.getProjectById)
 
 module.exports = router

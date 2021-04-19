@@ -7,22 +7,24 @@ const auth = async function (req: Request, res: Response, next: NextFunction) {
 
   // Check if no token
   if (!token) {
-    return res.status(401).json({ msg: 'No token, authorization denied' })
+    return res
+      .status(401)
+      .json({ errors: [{ msg: 'No token, authorization denied' }] })
   }
 
   // Verify token
   try {
-    await jwt.verify(token, process.env.JWT_SECRET || '', (error, decoded) => {
+    jwt.verify(token, process.env.JWT_SECRET || '', (error, decoded) => {
       if (error) {
-        res.status(401).json({ msg: 'Token is not valid' })
+        res.status(401).json({ errors: [{ msg: 'Token is not valid' }] })
       } else {
         req.user = (<any>decoded).user
         next()
       }
     })
-  } catch (err) {
-    console.error('something wrong with auth middleware')
-    res.status(500).json({ msg: 'Server Error' })
+  } catch (error) {
+    console.error(`Could not verify token => ${error}`)
+    res.status(500).json({ errors: [{ msg: 'Server error' }] })
   }
 }
 

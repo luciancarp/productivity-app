@@ -1,4 +1,4 @@
-import ProjectService from '../ProjectService'
+import ProjectService from '../project'
 import Project from '../../models/Project'
 import { Schema, Types } from 'mongoose'
 
