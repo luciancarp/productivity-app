@@ -5,9 +5,9 @@ import { createServer } from './utils/server'
 require('dotenv').config()
 
 // Connect Database
-db.connect()
+db.connect({ isTest: false })
 
-const app = createServer()
+createServer()
 
 // Serve static assets in production
 // if (process.env.NODE_ENV === 'production') {

@@ -3,7 +3,7 @@ import db from '../db'
 
 describe('Connection', () => {
   beforeAll(async () => {
-    await db.connect()
+    await db.connect({ isTest: true })
   })
 
   it('can create, get, update and remove a user', async () => {

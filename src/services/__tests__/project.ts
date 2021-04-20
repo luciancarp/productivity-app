@@ -1,8 +1,12 @@
+import { Schema, Types } from 'mongoose'
 import ProjectService from '../project'
 import Project from '../../models/Project'
-import { Schema, Types } from 'mongoose'
 
 describe('Project Service', () => {
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   it('fetches all Projects', () => {
     const mockProjectList = [
       {

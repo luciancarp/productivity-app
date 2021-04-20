@@ -1,9 +1,11 @@
 import mongoose from 'mongoose'
 require('dotenv').config()
 
-const db: string = process.env.MONGO_URI || ''
+const connect = async (settings: { isTest: boolean }) => {
+  let db: string = process.env.MONGO_URI || ''
 
-const connect = async () => {
+  if (settings.isTest) db = process.env.MONGO_URI_TEST || ''
+
   try {
     await mongoose.connect(db, {
       useUnifiedTopology: true,

@@ -18,7 +18,10 @@ const createUser = async (data: {
 
     newUserData.password = await bcrypt.hash(newUserData.password, salt)
 
-    const user = await new User(newUserData).save()
+    const user = new User(newUserData)
+
+    await user.save()
+
     return user._id
   } catch (error) {
     console.log(`Could not create User => ${error}`)
@@ -30,7 +33,7 @@ const getUserById = async (id: string) => {
     const user = await User.findById(id).select('-password')
     return user
   } catch (error) {
-    console.log(`Could not fetch User ${error}`)
+    console.log(`Could not fetch User => ${error}`)
   }
 }
 

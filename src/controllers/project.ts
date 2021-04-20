@@ -50,7 +50,7 @@ const createProject = async (req: Request, res: Response, next: Function) => {
     }
 
     const createdProject = await ProjectService.createProject(newProject)
-    res.status(200).json(createdProject)
+    res.status(201).json(createdProject)
   } catch (error) {
     res.status(500).json({ error: error })
   }

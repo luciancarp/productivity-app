@@ -36,7 +36,7 @@ const createUser = async (req: Request, res: Response, next: Function) => {
     }
 
     const newUser = await UserService.createUser(newUserData)
-    return res.status(200).json({ id: newUser._id })
+    return res.status(201).json({ id: newUser._id })
   } catch (error) {
     console.log(error)
     res.status(500).json({ errors: [{ msg: 'Server error' }] })
