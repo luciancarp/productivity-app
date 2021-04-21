@@ -6,20 +6,16 @@ import db from '../../utils/db'
 import { testUser, createTestUser } from '../../utils/tests/testUser'
 import User from '../../models/User'
 
-let server: Express
-let stopServer: () => void
+let server: any
 
 beforeAll(async () => {
   await db.connect({ isTest: true })
-  const { app, stop } = await createServer()
-  server = app
-  stopServer = stop
+  server = createServer()
 })
 
 afterAll(async (done) => {
   await db.close()
-  stopServer()
-  done()
+  server.close(done)
 })
 
 describe('POST /api/user', () => {

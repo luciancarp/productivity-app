@@ -1,11 +1,16 @@
 import express from 'express'
 require('dotenv').config()
 
-export const createServer = async () => {
+export const createServer = () => {
   const app = express()
 
   // Init Middleware
   app.use(express.json())
+
+  app.get('/', (req, res) => {
+    res.status(200)
+    res.send('ok')
+  })
 
   // Define Routes
   app.use('/api/user', require('../routes/api/user'))
@@ -17,9 +22,5 @@ export const createServer = async () => {
     console.log(`Server started on port ${PORT}`)
   })
 
-  const stop = () => {
-    server.close()
-  }
-
-  return { app, stop }
+  return server
 }
