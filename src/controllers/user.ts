@@ -66,18 +66,13 @@ const loginUser = async (req: Request, res: Response, next: Function) => {
   const { email, password } = req.body
 
   try {
-    const user = await UserService.getUserByEmail(email)
-
-    if (!user) {
-      return res.status(404).json({ errors: [{ msg: "User doesn't exist" }] })
-    }
-
     const token = await UserService.loginUser(email, password)
 
     return res.status(200).json({ token: token })
   } catch (error) {
-    console.error(error.message)
-    res.status(500).send('Server error')
+    if (error === 'Invalid Credentials')
+      res.status(404).json({ errors: [{ msg: 'Incorrect email or password' }] })
+    else res.status(500).send('Server error')
   }
 }
 

@@ -3,10 +3,11 @@ import User from '../../models/User'
 import UserService from '../user'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import user from '../user'
 
 describe('UserService', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
   })
 
   describe('createUser', () => {
@@ -15,48 +16,41 @@ describe('UserService', () => {
       email: 'test@test.com',
       password: 'test',
     }
-    const mockSalt = 'salt'
-    const mockHash = 'hash'
-
-    User.prototype.save = jest.fn().mockResolvedValue(mockUser)
-
-    const spyBcryptGenSalt = jest
-      .spyOn(bcrypt, 'genSalt')
-      .mockReturnValue(mockSalt as any)
-
-    const spyBcryptHash = jest
-      .spyOn(bcrypt, 'hash')
-      .mockReturnValue(mockHash as any)
 
     it('creates a user', async () => {
+      User.prototype.save = jest.fn().mockResolvedValue(mockUser)
+
       const response = await UserService.createUser(mockUser)
 
       expect(response.toString()).toMatch(/^[0-9a-fA-F]{24}$/)
     })
 
     it('generates salt', async () => {
+      const spy = jest.spyOn(bcrypt, 'genSalt')
+
       await UserService.createUser(mockUser)
 
-      const spySalt = spyBcryptGenSalt.mock.results[0].value
-
-      expect(spyBcryptGenSalt).toHaveBeenCalledTimes(1)
-      expect(spySalt).toEqual(mockSalt)
+      expect(spy).toHaveBeenCalledTimes(1)
+      expect(spy).toHaveBeenCalledWith(10)
     })
 
     it('hashes password', async () => {
+      const mockSalt = 'salt'
+      const spy = jest.spyOn(bcrypt, 'hash')
+
+      bcrypt.genSalt = jest.fn().mockReturnValue(mockSalt)
+
       await UserService.createUser(mockUser)
 
-      const spyHash = spyBcryptHash.mock.results[0].value
-
-      expect(spyBcryptHash).toHaveBeenCalledTimes(1)
-      expect(spyHash).toEqual(mockHash)
+      expect(spy).toHaveBeenCalledTimes(1)
+      expect(spy).toHaveBeenCalledWith(mockUser.password, mockSalt)
     })
   })
 
   describe('getUserById', () => {
     it('fetches a user by id', async () => {
       const mockFetchedUser = {
-        _id: Types.ObjectId(),
+        id: Types.ObjectId(),
         name: 'test',
         email: 'test@test.com',
       }
@@ -66,7 +60,7 @@ describe('UserService', () => {
       }))
 
       const fetchedUser = await UserService.getUserById(
-        mockFetchedUser._id.toString()
+        mockFetchedUser.id.toString()
       )
 
       if (!fetchedUser) {
@@ -75,6 +69,7 @@ describe('UserService', () => {
 
       expect(fetchedUser.name).toEqual(mockFetchedUser.name)
       expect(fetchedUser.email).toEqual(mockFetchedUser.email)
+      expect(User.findById).toHaveBeenCalledWith(mockFetchedUser.id.toString())
     })
   })
 
@@ -98,6 +93,7 @@ describe('UserService', () => {
 
       expect(fetchedUser.name).toEqual(mockUser.name)
       expect(fetchedUser.email).toEqual(mockUser.email)
+      expect(User.findOne).toHaveBeenCalledWith({ email: mockUser.email })
     })
   })
 
@@ -133,6 +129,10 @@ describe('UserService', () => {
 
       expect(spy).toHaveBeenCalledTimes(1)
       expect(spyUpdatedUser).toEqual(mockUpdatedUser)
+      expect(spy).toHaveBeenCalledWith(
+        { _id: mockUser._id.toString() },
+        { ...mockUpdate }
+      )
     })
   })
 
@@ -169,7 +169,7 @@ describe('UserService', () => {
       }
 
       let errorToken
-      let decodedToken
+      let decodedToken: any
       jwt.verify(token, process.env.JWT_SECRET || '', (error, decoded) => {
         errorToken = error
         decodedToken = decoded
@@ -177,6 +177,7 @@ describe('UserService', () => {
 
       expect(errorToken).toBeNull()
       expect(decodedToken).toBeTruthy()
+      expect(decodedToken.user.id).toEqual(mockId.toString())
     })
   })
 
@@ -195,27 +196,29 @@ describe('UserService', () => {
 
     it('fetches user by email', async () => {
       const spy = jest.spyOn(User, 'findOne').mockReturnValue(mockUser as any)
+      bcrypt.compare = jest.fn().mockReturnValue(true)
 
       await UserService.loginUser(mockLogin.email, mockLogin.password)
 
-      const spyFetchedUser = spy.mock.results[0].value
-
       expect(spy).toHaveBeenCalledTimes(1)
-      expect(spyFetchedUser.email).toEqual(mockUser.email)
+      expect(spy).toHaveBeenCalledWith({ email: mockLogin.email })
     })
 
     it('compares given password with stored hash', async () => {
       const spy = jest.spyOn(bcrypt, 'compare').mockReturnValue(true as any)
 
+      User.findOne = jest.fn().mockReturnValue(mockUser)
+
       await UserService.loginUser(mockLogin.email, mockLogin.password)
 
-      const spyIsMatch = spy.mock.results[0].value
-
       expect(spy).toHaveBeenCalledTimes(1)
-      expect(spyIsMatch).toBeTruthy()
+      expect(spy).toHaveBeenCalledWith(mockLogin.password, mockUser.password)
     })
 
     it('returns token', async () => {
+      User.findOne = jest.fn().mockReturnValue(mockUser)
+      bcrypt.compare = jest.fn().mockReturnValue(true)
+
       const token = await UserService.loginUser(
         mockLogin.email,
         mockLogin.password
@@ -225,15 +228,7 @@ describe('UserService', () => {
         throw new Error('Token is null')
       }
 
-      let errorToken
-      let decodedToken
-      jwt.verify(token, process.env.JWT_SECRET || '', (error, decoded) => {
-        errorToken = error
-        decodedToken = decoded
-      })
-
-      expect(errorToken).toBeNull()
-      expect(decodedToken).toBeTruthy()
+      expect(token).toBeTruthy()
     })
   })
 })

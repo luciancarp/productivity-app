@@ -3,7 +3,8 @@ import ProjectService from '../project'
 import Project from '../../models/Project'
 
 describe('Project Service', () => {
-  afterEach(() => {
+  beforeEach(() => {
+    jest.restoreAllMocks()
     jest.resetAllMocks()
   })
 
@@ -33,8 +34,6 @@ describe('Project Service', () => {
 
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spyFetchedProjects).toHaveLength(3)
-
-    spy.mockReset()
   })
 
   it('creates a Project', () => {
@@ -53,8 +52,6 @@ describe('Project Service', () => {
 
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spyCreatedProject.title).toEqual(mockProject.title)
-
-    spy.mockReset()
   })
 
   it('fetches a Project by id', () => {
@@ -74,8 +71,6 @@ describe('Project Service', () => {
 
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spyFetchedProject._id).toEqual(spyFetchedProject._id)
-
-    spy.mockReset()
   })
 
   it('deletes a project', () => {
@@ -95,7 +90,5 @@ describe('Project Service', () => {
 
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spyDeletedProject).toEqual(mockProject)
-
-    spy.mockReset()
   })
 })

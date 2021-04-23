@@ -9,15 +9,13 @@ describe('Auth middleware', () => {
   let nextFunction: NextFunction = jest.fn()
 
   beforeEach(() => {
+    jest.resetAllMocks()
+
     mockRequest = {}
     mockResponse = {
       status: jest.fn(),
       json: jest.fn(),
     }
-  })
-
-  afterEach(() => {
-    jest.clearAllMocks()
   })
 
   describe('given a valid token', () => {

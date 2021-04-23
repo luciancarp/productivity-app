@@ -44,3 +44,10 @@ describe('POST /api/user', () => {
     done()
   })
 })
+
+describe('POST /api/user/login', () => {
+  it('given a valid login request returns 200 and token', async () => {})
+  it('given an invalid email returns 404 error', async () => {})
+  it('given an invalid passowrd returns 404 error', async () => {})
+})
+describe('GET /api/user', () => {})

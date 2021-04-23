@@ -112,6 +112,7 @@ const loginUser = async (email: string, password: string) => {
     return token
   } catch (error) {
     console.log(`Could not login user => ${error}`)
+    if (error === 'Invalid Credentials') throw error
   }
 }
 
