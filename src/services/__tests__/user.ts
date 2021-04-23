@@ -3,7 +3,7 @@ import User from '../../models/User'
 import UserService from '../user'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import user from '../user'
+import { mockUser } from '../../utils/tests/testUser'
 
 describe('UserService', () => {
   afterEach(() => {
@@ -11,16 +11,13 @@ describe('UserService', () => {
   })
 
   describe('createUser', () => {
-    const mockUser = {
-      name: 'test',
-      email: 'test@test.com',
-      password: 'test',
-    }
-
+    const { name, email, password } = mockUser
     it('creates a user', async () => {
-      User.prototype.save = jest.fn().mockResolvedValue(mockUser)
+      User.prototype.save = jest
+        .fn()
+        .mockResolvedValue({ name, email, password })
 
-      const response = await UserService.createUser(mockUser)
+      const response = await UserService.createUser({ name, email, password })
 
       expect(response.toString()).toMatch(/^[0-9a-fA-F]{24}$/)
     })
@@ -28,14 +25,14 @@ describe('UserService', () => {
     it('generates salt', async () => {
       const spy = jest.spyOn(bcrypt, 'genSalt')
 
-      await UserService.createUser(mockUser)
+      await UserService.createUser({ name, email, password })
 
       expect(spy).toHaveBeenCalledTimes(1)
       expect(spy).toHaveBeenCalledWith(10)
     })
 
     it('hashes password', async () => {
-      const mockSalt = 'salt'
+      const mockSalt = '$2a$10$xOSv6opu8HKptJDDY2R1m.'
       const spy = jest.spyOn(bcrypt, 'hash')
 
       bcrypt.genSalt = jest.fn().mockReturnValue(mockSalt)
@@ -48,121 +45,92 @@ describe('UserService', () => {
   })
 
   describe('getUserById', () => {
+    const { id, name, email } = mockUser
     it('fetches a user by id', async () => {
-      const mockFetchedUser = {
-        id: Types.ObjectId(),
-        name: 'test',
-        email: 'test@test.com',
-      }
-
       User.findById = jest.fn().mockImplementationOnce(() => ({
-        select: jest.fn().mockResolvedValueOnce(mockFetchedUser),
+        select: jest.fn().mockResolvedValueOnce(mockUser),
       }))
 
-      const fetchedUser = await UserService.getUserById(
-        mockFetchedUser.id.toString()
-      )
+      const fetchedUser = await UserService.getUserById(id)
 
       if (!fetchedUser) {
         throw new Error('User is null')
       }
 
-      expect(fetchedUser.name).toEqual(mockFetchedUser.name)
-      expect(fetchedUser.email).toEqual(mockFetchedUser.email)
-      expect(User.findById).toHaveBeenCalledWith(mockFetchedUser.id.toString())
+      expect(fetchedUser.name).toEqual(name)
+      expect(fetchedUser.email).toEqual(email)
+      expect(User.findById).toHaveBeenCalledWith(id)
     })
   })
 
   describe('getUserByEmail', () => {
     it('fetches a user by email', async () => {
-      const mockUser = {
-        _id: Types.ObjectId(),
-        name: 'test',
-        email: 'test@test.com',
-      }
+      const { name, email } = mockUser
 
       User.findOne = jest.fn().mockImplementationOnce(() => ({
         select: jest.fn().mockResolvedValueOnce(mockUser),
       }))
 
-      const fetchedUser = await UserService.getUserByEmail(mockUser.email)
+      const fetchedUser = await UserService.getUserByEmail(email)
 
       if (!fetchedUser) {
         throw new Error('User is null')
       }
 
-      expect(fetchedUser.name).toEqual(mockUser.name)
-      expect(fetchedUser.email).toEqual(mockUser.email)
-      expect(User.findOne).toHaveBeenCalledWith({ email: mockUser.email })
+      expect(fetchedUser.name).toEqual(name)
+      expect(fetchedUser.email).toEqual(email)
+      expect(User.findOne).toHaveBeenCalledWith({ email })
     })
   })
 
   describe('updateUser', () => {
+    const { id } = mockUser
     it('updates a user', () => {
-      const mockUser = {
-        _id: Types.ObjectId(),
-        name: 'test0',
-        email: 'test@test.com',
-        password: 'test',
-      }
-
-      const mockUpdatedUser = {
-        _id: mockUser._id,
-        name: 'test1',
-        email: 'test@test.com',
-        password: 'test',
-      }
-
       const mockUpdate = {
         name: 'test1',
         email: 'test@test.com',
         password: 'test',
       }
 
+      const mockUpdatedUser = {
+        id,
+        ...mockUpdate,
+      }
+
       const spy = jest
         .spyOn(User, 'findOneAndUpdate')
         .mockReturnValueOnce(mockUpdatedUser as any)
 
-      UserService.updateUser(mockUser._id.toString(), mockUpdate)
+      UserService.updateUser(id, mockUpdate)
 
       const spyUpdatedUser = spy.mock.results[0].value
 
       expect(spy).toHaveBeenCalledTimes(1)
       expect(spyUpdatedUser).toEqual(mockUpdatedUser)
-      expect(spy).toHaveBeenCalledWith(
-        { _id: mockUser._id.toString() },
-        { ...mockUpdate }
-      )
+      expect(spy).toHaveBeenCalledWith({ _id: id }, { ...mockUpdate })
     })
   })
 
   describe('deleteUser', () => {
+    const { id, name, email, password } = mockUser
     it('deletes a user', () => {
-      const mockUser = {
-        _id: Types.ObjectId(),
-        name: 'test',
-        email: 'test@test.com',
-        password: 'test',
-      }
-
       const spy = jest
         .spyOn(User, 'findOneAndDelete')
-        .mockReturnValueOnce(mockUser as any)
+        .mockReturnValueOnce({ id, name, email, password } as any)
 
-      UserService.deleteUser(mockUser._id.toString())
+      UserService.deleteUser(id)
 
       const spyDeletedUser = spy.mock.results[0].value
 
       expect(spy).toHaveBeenCalledTimes(1)
-      expect(spyDeletedUser).toEqual(mockUser)
+      expect(spyDeletedUser).toEqual({ id, name, email, password })
     })
   })
 
   describe('createAuthToken', () => {
+    const { id } = mockUser
     it('creates a token', async () => {
-      const mockId = Types.ObjectId()
-
-      const token = await UserService.createAuthToken(mockId.toString())
+      const token = await UserService.createAuthToken(id)
 
       if (!token) {
         throw new Error('Token is null')
@@ -177,46 +145,43 @@ describe('UserService', () => {
 
       expect(errorToken).toBeNull()
       expect(decodedToken).toBeTruthy()
-      expect(decodedToken.user.id).toEqual(mockId.toString())
+      expect(decodedToken.user.id).toEqual(id)
     })
   })
 
   describe('loginUser', () => {
-    const mockLogin = {
-      email: 'test@test.com',
-      password: 'test',
-    }
+    const { id, name, email, password } = mockUser
 
-    const mockUser = {
-      _id: Types.ObjectId(),
-      name: 'test',
-      email: 'test@test.com',
-      password: 'test',
+    const mockLogin = {
+      email,
+      password,
     }
 
     it('fetches user by email', async () => {
-      const spy = jest.spyOn(User, 'findOne').mockReturnValue(mockUser as any)
+      const spy = jest
+        .spyOn(User, 'findOne')
+        .mockReturnValue({ id, name, email, password } as any)
       bcrypt.compare = jest.fn().mockReturnValue(true)
 
       await UserService.loginUser(mockLogin.email, mockLogin.password)
 
       expect(spy).toHaveBeenCalledTimes(1)
-      expect(spy).toHaveBeenCalledWith({ email: mockLogin.email })
+      expect(spy).toHaveBeenCalledWith({ email })
     })
 
     it('compares given password with stored hash', async () => {
       const spy = jest.spyOn(bcrypt, 'compare').mockReturnValue(true as any)
 
-      User.findOne = jest.fn().mockReturnValue(mockUser)
+      User.findOne = jest.fn().mockReturnValue({ id, name, email, password })
 
       await UserService.loginUser(mockLogin.email, mockLogin.password)
 
       expect(spy).toHaveBeenCalledTimes(1)
-      expect(spy).toHaveBeenCalledWith(mockLogin.password, mockUser.password)
+      expect(spy).toHaveBeenCalledWith(mockLogin.password, password)
     })
 
     it('returns token', async () => {
-      User.findOne = jest.fn().mockReturnValue(mockUser)
+      User.findOne = jest.fn().mockReturnValue({ id, name, email, password })
       bcrypt.compare = jest.fn().mockReturnValue(true)
 
       const token = await UserService.loginUser(

@@ -3,7 +3,7 @@ import { Express } from 'express'
 
 import { createServer } from '../../utils/server'
 import db from '../../utils/db'
-import { testUser, createTestUser } from '../../utils/tests/testUser'
+import { mockUser } from '../../utils/tests/testUser'
 import User from '../../models/User'
 
 let server: any
@@ -20,16 +20,18 @@ afterAll(async (done) => {
 
 describe('POST /api/user', () => {
   it('creates a new User', async (done) => {
-    const user = testUser()
+    const { name, email, password } = mockUser
 
-    const res = await request(server).post('/api/user').send(user)
+    const res = await request(server)
+      .post('/api/user')
+      .send({ name, email, password })
 
     expect(res.status).toEqual(201)
     expect(res.body).toMatchObject({
       id: expect.stringMatching(/^[0-9a-fA-F]{24}$/),
     })
 
-    const createdUser = await User.findOne({ email: user.email })
+    const createdUser = await User.findOne({ email })
 
     if (!createdUser) {
       throw new Error('User is null')
