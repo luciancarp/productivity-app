@@ -13,7 +13,7 @@ export const createUserValidation = [
 
 export const loginUserValidation = [
   check('email', 'Please include a valid email').isEmail(),
-  check('password', 'Password is required').exists(),
+  check('password', 'Password is required').exists().notEmpty(),
 ]
 
 const createUser = async (req: Request, res: Response, next: Function) => {
@@ -48,31 +48,31 @@ const getUser = async (req: Request, res: Response, next: Function) => {
     const user = await UserService.getUserById(req.user.id)
 
     if (!user) {
-      return res.status(404).json({ msg: 'User not found' })
+      return res.status(400).json({ errors: [{ msg: 'User not found' }] })
     }
 
     res.status(200).json(user)
   } catch (error) {
-    res.status(500).json({ error: error })
+    res.status(500).json({ errors: [{ msg: 'Server error' }] })
   }
 }
 
 const loginUser = async (req: Request, res: Response, next: Function) => {
-  const errors = validationResult(req)
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() })
-  }
-
-  const { email, password } = req.body
-
   try {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() })
+    }
+
+    const { email, password } = req.body
+
     const token = await UserService.loginUser(email, password)
 
     return res.status(200).json({ token: token })
   } catch (error) {
-    if (error === 'Invalid Credentials')
-      res.status(404).json({ errors: [{ msg: 'Incorrect email or password' }] })
-    else res.status(500).send('Server error')
+    if (error.message === 'Invalid Credentials')
+      res.status(400).json({ errors: [{ msg: 'Incorrect email or password' }] })
+    else res.status(500).send({ errors: [{ msg: 'Server error' }] })
   }
 }
 

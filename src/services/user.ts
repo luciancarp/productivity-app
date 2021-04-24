@@ -24,7 +24,7 @@ const createUser = async (data: {
 
     return user._id
   } catch (error) {
-    console.log(`Could not create User => ${error}`)
+    console.log(`UserService => Could not create User => ${error}`)
   }
 }
 
@@ -33,7 +33,7 @@ const getUserById = async (id: string) => {
     const user = await User.findById(id).select('-password')
     return user
   } catch (error) {
-    console.log(`Could not fetch User => ${error}`)
+    console.log(`UserService => Could not fetch User => ${error}`)
   }
 }
 
@@ -42,7 +42,7 @@ const getUserByEmail = async (email: string) => {
     const user = await User.findOne({ email }).select('-password')
     return user
   } catch (error) {
-    console.log(`Could not fetch User => ${error}`)
+    console.log(`UserService => Could not fetch User => ${error}`)
   }
 }
 
@@ -58,7 +58,7 @@ const updateUser = async (
     const user = await User.findOneAndUpdate({ _id: id }, { ...update })
     return user
   } catch (error) {
-    console.log(`Could not update User => ${error}`)
+    console.log(`UserService => Could not update User => ${error}`)
   }
 }
 
@@ -67,7 +67,7 @@ const deleteUser = async (id: string) => {
     const user = await User.findOneAndDelete({ _id: id })
     return user
   } catch (error) {
-    console.log(`Could not delete User => ${error}`)
+    console.log(`UserService => Could not delete User => ${error}`)
   }
 }
 
@@ -89,7 +89,7 @@ const createAuthToken = async (id: string) => {
 
     return token
   } catch (error) {
-    console.log(`Could not create token ${error}`)
+    console.log(`UserService => Could not create token ${error}`)
   }
 }
 
@@ -98,21 +98,21 @@ const loginUser = async (email: string, password: string) => {
     let user = await User.findOne({ email })
 
     if (!user) {
-      throw 'Invalid Credentials'
+      throw new Error('Invalid Credentials')
     }
 
     const isMatch = await bcrypt.compare(password, user.password)
 
     if (!isMatch) {
-      throw 'Invalid Credentials'
+      throw new Error('Invalid Credentials')
     }
 
     const token = await createAuthToken(user.id)
 
     return token
   } catch (error) {
-    console.log(`Could not login user => ${error}`)
-    if (error === 'Invalid Credentials') throw error
+    console.log(`UserService => Could not login user => ${error}`)
+    throw error
   }
 }
 

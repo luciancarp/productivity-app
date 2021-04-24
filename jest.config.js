@@ -18,4 +18,7 @@ module.exports = {
   coverageReporters: ['json', 'lcov', 'text', 'clover'],
   testEnvironment: 'node',
   setupFiles: ['dotenv/config'],
+  restoreMocks: true,
+  clearMocks: true,
+  resetMocks: true,
 }

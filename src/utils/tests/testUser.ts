@@ -1,5 +1,6 @@
 import faker from 'faker'
-import { Schema, Types } from 'mongoose'
+import { Types } from 'mongoose'
+import UserService from '../../services/user'
 
 import User from '../../models/User'
 
@@ -24,6 +25,20 @@ export const testUser = async () => {
     password: faker.internet.password(),
   }
 
-  const user = await new User(userData).save()
-  return user
+  // const user = await new User(userData).save()
+  const createdUserId = await UserService.createUser(userData)
+
+  const user = await User.findById(createdUserId.toString())
+
+  if (!user) throw new Error('User not found')
+
+  return { user, password: userData.password }
+}
+
+export const authorizedTestUser = async () => {
+  const { user, password } = await testUser()
+
+  const token = await UserService.createAuthToken(user._id)
+
+  return { user, token }
 }
