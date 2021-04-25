@@ -1,44 +1,16 @@
 import { Schema, Types } from 'mongoose'
+import faker from 'faker'
 import ProjectService from '../project'
 import Project from '../../models/Project'
 
 describe('Project Service', () => {
-  beforeEach(() => {
-    jest.restoreAllMocks()
+  afterEach(() => {
     jest.resetAllMocks()
-  })
-
-  it('fetches all Projects', () => {
-    const mockProjectList = [
-      {
-        title: 'test0',
-        user: new Schema.Types.ObjectId('test0'),
-      },
-      {
-        title: 'test1',
-        user: new Schema.Types.ObjectId('test1'),
-      },
-      {
-        title: 'test2',
-        user: new Schema.Types.ObjectId('test2'),
-      },
-    ]
-
-    const spy = jest
-      .spyOn(Project, 'find')
-      .mockReturnValueOnce(mockProjectList as any)
-
-    ProjectService.getAllProjects()
-
-    const spyFetchedProjects = spy.mock.results[0].value
-
-    expect(spy).toHaveBeenCalledTimes(1)
-    expect(spyFetchedProjects).toHaveLength(3)
   })
 
   it('creates a Project', () => {
     const mockProject = {
-      title: 'test',
+      title: faker.lorem.word(),
       user: new Schema.Types.ObjectId('test'),
     }
 
@@ -57,7 +29,7 @@ describe('Project Service', () => {
   it('fetches a Project by id', () => {
     const mockProject = {
       _id: Types.ObjectId(),
-      title: 'test',
+      title: faker.lorem.word(),
       user: new Schema.Types.ObjectId('test'),
     }
 
@@ -65,7 +37,7 @@ describe('Project Service', () => {
       .spyOn(Project, 'findById')
       .mockReturnValueOnce(mockProject as any)
 
-    ProjectService.getProjectbyId(mockProject._id.toString())
+    ProjectService.getProject(mockProject._id.toString())
 
     const spyFetchedProject = spy.mock.results[0].value
 
@@ -73,10 +45,36 @@ describe('Project Service', () => {
     expect(spyFetchedProject._id).toEqual(spyFetchedProject._id)
   })
 
-  it('deletes a project', () => {
+  it('updates a Project', () => {
+    const id = Types.ObjectId().toString()
+
+    const mockUpdate = {
+      title: faker.lorem.word(),
+    }
+
+    const mockUpdatedProject = {
+      _id: id,
+      user: new Schema.Types.ObjectId('test'),
+      ...mockUpdate,
+    }
+
+    const spy = jest
+      .spyOn(Project, 'findOneAndUpdate')
+      .mockReturnValueOnce(mockUpdatedProject as any)
+
+    ProjectService.updateProject(id, mockUpdate)
+
+    const spyUpdatedProject = spy.mock.results[0].value
+
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spyUpdatedProject).toEqual(mockUpdatedProject)
+    expect(spy).toHaveBeenCalledWith({ _id: id }, { ...mockUpdate })
+  })
+
+  it('deletes a Project', () => {
     const mockProject = {
       _id: Types.ObjectId(),
-      title: 'test',
+      title: faker.lorem.word(),
       user: new Schema.Types.ObjectId('test'),
     }
 
@@ -90,5 +88,39 @@ describe('Project Service', () => {
 
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spyDeletedProject).toEqual(mockProject)
+  })
+
+  it("fetches a User's Projects", () => {
+    const userId = Types.ObjectId()
+
+    const mockProjectList = [
+      {
+        _id: Types.ObjectId(),
+        title: faker.lorem.word(),
+        user: userId,
+      },
+      {
+        _id: Types.ObjectId(),
+        title: faker.lorem.word(),
+        user: userId,
+      },
+      {
+        _id: Types.ObjectId(),
+        title: faker.lorem.word(),
+        user: userId,
+      },
+    ]
+
+    const spy = jest
+      .spyOn(Project, 'find')
+      .mockReturnValueOnce(mockProjectList as any)
+
+    ProjectService.getUserProjects(userId.toString())
+
+    const spyUserProjects = spy.mock.results[0].value
+
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spyUserProjects).toMatchObject(mockProjectList)
+    expect(spy).toHaveBeenCalledWith({ user: userId.toString() })
   })
 })

@@ -1,14 +1,5 @@
-import { Schema } from 'mongoose'
+import mongoose, { Schema, Types } from 'mongoose'
 import Project from '../models/Project'
-
-const getAllProjects = async () => {
-  try {
-    const allProjects = await Project.find()
-    return allProjects
-  } catch (error) {
-    console.log(`Could not fetch Projects => ${error}`)
-  }
-}
 
 const createProject = async (data: {
   title: string
@@ -19,36 +10,63 @@ const createProject = async (data: {
       title: data.title,
       user: data.user,
     }
-    const response = await new Project(newProject).save()
-    return response
+    const project = new Project(newProject)
+
+    project.save()
+
+    return project
   } catch (error) {
-    console.log(`Could not create Project => ${error}`)
+    console.log(`ProjectService => Could not create Project => ${error}`)
   }
 }
 
-const getProjectbyId = async (projectId: string) => {
+const getProject = async (projectId: string) => {
   try {
-    const singleProjectResponse = await Project.findById({ _id: projectId })
-    return singleProjectResponse
+    const project = await Project.findById({ _id: projectId })
+    return project
   } catch (error) {
-    console.log(`Could not fetch Project => ${error}`)
+    console.log(`ProjectService => Could not fetch Project => ${error}`)
   }
 }
 
-//TODO updateProject
-
-const deleteProject = async (projectId: string) => {
+const updateProject = async (
+  id: string,
+  update: {
+    title: string
+  }
+) => {
   try {
-    const deletedResponse = await Project.findOneAndDelete({ _id: projectId })
-    return deletedResponse
+    const project = await Project.findOneAndUpdate({ _id: id }, { ...update })
+    return project
   } catch (error) {
-    console.log(`Could not delete Project => ${error}`)
+    console.log(`ProjectService => Could not update Project => ${error}`)
+  }
+}
+
+const deleteProject = async (id: string) => {
+  try {
+    const project = await Project.findOneAndDelete({ _id: id })
+    return project
+  } catch (error) {
+    console.log(`ProjectService => Could not delete Project => ${error}`)
+  }
+}
+
+const getUserProjects = async (userId: string) => {
+  try {
+    const query: any = { user: userId }
+
+    const projects = await Project.find(query)
+    return projects
+  } catch (error) {
+    console.log(`ProjectService => Could not fetch User's Projects => ${error}`)
   }
 }
 
 export default {
-  getAllProjects: getAllProjects,
-  createProject: createProject,
-  getProjectbyId: getProjectbyId,
-  deleteProject: deleteProject,
+  createProject,
+  getProject,
+  updateProject,
+  deleteProject,
+  getUserProjects,
 }
