@@ -1,19 +1,15 @@
 {
-  "name": "mern-template",
+  "name": "productivity-app",
   "version": "1.0.0",
-  "description": "mern project template",
+  "description": "Productivity app",
   "main": "dist/src/server.js",
   "scripts": {
     "test": "jest --coverage",
     "test:watch": "jest --coverage --watchAll",
     "build": "tsc",
-    "client-install": "cd client/ && yarn install",
-    "client-build": "cd client/ && yarn run build",
-    "start": "tsc && node dist/server.js",
+    "start": "node dist/server.js",
     "server": "tsc && concurrently \"tsc -w\" \"nodemon dist/server.js\"",
-    "client": "cd client/ && yarn start",
-    "full-install": "yarn install && yarn client-install",
-    "dev": "concurrently \"tsc -w\" \"yarn server\" \"yarn client\""
+    "postinstall": "tsc"
   },
   "author": "Lucian Carp",
   "license": "MIT",
@@ -44,5 +40,8 @@
     "sinon": "^10.0.0",
     "supertest": "^6.1.3",
     "ts-jest": "^26.5.5"
+  },
+  "engines": {
+    "node": "14.x"
   }
 }
