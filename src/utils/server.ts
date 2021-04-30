@@ -1,7 +1,7 @@
 import express from 'express'
 require('dotenv').config()
 
-export const createServer = () => {
+export const createServer = (port: string) => {
   const app = express()
 
   // Init Middleware
@@ -16,10 +16,8 @@ export const createServer = () => {
   app.use('/api/user', require('../routes/api/user'))
   app.use('/api/project', require('../routes/api/project'))
 
-  const PORT = process.env.PORT || 5000
-
-  let server = app.listen(PORT, () => {
-    console.log(`Server started on port ${PORT}`)
+  let server = app.listen(port, () => {
+    console.log(`Server started on port ${port}`)
   })
 
   return server

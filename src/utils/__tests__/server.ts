@@ -3,9 +3,10 @@ import { createServer } from '../server'
 
 describe('createServer', () => {
   let server: any
+  const PORT = process.env.PORT || '5000'
 
   beforeAll(() => {
-    server = createServer()
+    server = createServer(PORT)
   })
 
   afterAll((done) => {
