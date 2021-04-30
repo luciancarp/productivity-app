@@ -3,7 +3,7 @@ import { Types } from 'mongoose'
 import jwt from 'jsonwebtoken'
 import faker from 'faker'
 
-import { createServer } from '../../utils/server'
+import { testServer } from '../../utils/tests/testServer'
 import db from '../../utils/db'
 import {
   mockUser,
@@ -13,16 +13,15 @@ import {
 import User from '../../models/User'
 import UserService from '../../services/user'
 
-let server: any
+let app: any
 
 beforeAll(async () => {
   await db.connect({ isTest: true })
-  server = createServer()
+  app = testServer()
 })
 
-afterAll(async (done) => {
+afterAll(async () => {
   await db.close()
-  server.close(done)
 })
 
 describe('POST /api/user', () => {
@@ -34,7 +33,7 @@ describe('POST /api/user', () => {
   it('given a valid request creates user then returns 201 and user id', async (done) => {
     const { name, email, password } = mockUser
 
-    const res = await request(server)
+    const res = await request(app)
       .post('/api/user')
       .send({ name, email, password })
 
@@ -65,7 +64,7 @@ describe('POST /api/user', () => {
   it('if user already exists returns 400 error', async (done) => {
     const { user, password } = await testUser()
 
-    const res = await request(server)
+    const res = await request(app)
       .post('/api/user')
       .send({ name: user.name, email: user.email, password })
 
@@ -80,7 +79,7 @@ describe('POST /api/user', () => {
     const email = faker.internet.email()
     const password = faker.internet.password()
 
-    const res = await request(server)
+    const res = await request(app)
       .post('/api/user')
       .send({ name, email, password })
 
@@ -93,9 +92,7 @@ describe('POST /api/user', () => {
     const email = faker.internet.email()
     const password = faker.internet.password()
 
-    const res = await request(server)
-      .post('/api/user')
-      .send({ email, password })
+    const res = await request(app).post('/api/user').send({ email, password })
 
     expect(res.status).toEqual(400)
     expect(res.body.errors[0].msg).toEqual(nameValidationError)
@@ -107,7 +104,7 @@ describe('POST /api/user', () => {
     const email = faker.internet.email()
     const password = faker.internet.password()
 
-    const res = await request(server)
+    const res = await request(app)
       .post('/api/user')
       .send({ name, email, password })
 
@@ -122,7 +119,7 @@ describe('POST /api/user', () => {
     const email = 'invalid'
     const password = faker.internet.password()
 
-    const res = await request(server)
+    const res = await request(app)
       .post('/api/user')
       .send({ name, email, password })
 
@@ -135,7 +132,7 @@ describe('POST /api/user', () => {
     const name = faker.name.firstName()
     const password = faker.internet.password()
 
-    const res = await request(server).post('/api/user').send({ name, password })
+    const res = await request(app).post('/api/user').send({ name, password })
 
     expect(res.status).toEqual(400)
     expect(res.body.errors[0].msg).toEqual(emailValidationError)
@@ -147,7 +144,7 @@ describe('POST /api/user', () => {
     const email = null
     const password = faker.internet.password()
 
-    const res = await request(server)
+    const res = await request(app)
       .post('/api/user')
       .send({ name, email, password })
 
@@ -162,7 +159,7 @@ describe('POST /api/user', () => {
     const email = faker.internet.email()
     const password = ''
 
-    const res = await request(server)
+    const res = await request(app)
       .post('/api/user')
       .send({ name, email, password })
 
@@ -175,7 +172,7 @@ describe('POST /api/user', () => {
     const name = faker.name.firstName()
     const email = faker.internet.email()
 
-    const res = await request(server).post('/api/user').send({ name, email })
+    const res = await request(app).post('/api/user').send({ name, email })
 
     expect(res.status).toEqual(400)
     expect(res.body.errors[0].msg).toEqual(passwordNewValidationError)
@@ -187,7 +184,7 @@ describe('POST /api/user', () => {
     const email = faker.internet.email()
     const password = null
 
-    const res = await request(server)
+    const res = await request(app)
       .post('/api/user')
       .send({ name, email, password })
 
@@ -211,7 +208,7 @@ describe('POST /api/user', () => {
       throw new Error(errorMsg)
     })
 
-    const res = await request(server)
+    const res = await request(app)
       .post('/api/user')
       .send({ name, email, password })
 
@@ -231,7 +228,7 @@ describe('POST /api/user/login', () => {
   it('given a valid login request returns 200 and token', async (done) => {
     const { user, password } = await testUser()
 
-    const res = await request(server).post('/api/user/login').send({
+    const res = await request(app).post('/api/user/login').send({
       email: user.email,
       password: password,
     })
@@ -265,7 +262,7 @@ describe('POST /api/user/login', () => {
     const invalidEmail = 'invalid'
     const password = faker.internet.password()
 
-    const res = await request(server).post('/api/user/login').send({
+    const res = await request(app).post('/api/user/login').send({
       email: invalidEmail,
       password: password,
     })
@@ -279,7 +276,7 @@ describe('POST /api/user/login', () => {
   it('given no email returns 400 error', async (done) => {
     const password = faker.internet.password()
 
-    const res = await request(server).post('/api/user/login').send({
+    const res = await request(app).post('/api/user/login').send({
       password,
     })
 
@@ -293,7 +290,7 @@ describe('POST /api/user/login', () => {
     const email = null
     const password = faker.internet.password()
 
-    const res = await request(server).post('/api/user/login').send({
+    const res = await request(app).post('/api/user/login').send({
       email,
       password,
     })
@@ -308,7 +305,7 @@ describe('POST /api/user/login', () => {
     const { user, password } = await testUser()
     const invalidPassword = faker.internet.password()
 
-    const res = await request(server).post('/api/user/login').send({
+    const res = await request(app).post('/api/user/login').send({
       email: user.email,
       password: invalidPassword,
     })
@@ -323,7 +320,7 @@ describe('POST /api/user/login', () => {
     const { user, password } = await testUser()
     const invalidPassword = null
 
-    const res = await request(server).post('/api/user/login').send({
+    const res = await request(app).post('/api/user/login').send({
       email: user.email,
       password: invalidPassword,
     })
@@ -336,7 +333,7 @@ describe('POST /api/user/login', () => {
     const { user, password } = await testUser()
     const invalidPassword = ''
 
-    const res = await request(server).post('/api/user/login').send({
+    const res = await request(app).post('/api/user/login').send({
       email: user.email,
       password: invalidPassword,
     })
@@ -348,7 +345,7 @@ describe('POST /api/user/login', () => {
   it('given no password returns 400 error', async (done) => {
     const { user, password } = await testUser()
 
-    const res = await request(server).post('/api/user/login').send({
+    const res = await request(app).post('/api/user/login').send({
       email: user.email,
     })
 
@@ -366,7 +363,7 @@ describe('POST /api/user/login', () => {
       throw new Error(errorMsg)
     })
 
-    const res = await request(server).post('/api/user/login').send({
+    const res = await request(app).post('/api/user/login').send({
       email: user.email,
       password: user.password,
     })
@@ -385,9 +382,7 @@ describe('GET /api/user', () => {
 
     if (token === undefined) throw new Error('No token')
 
-    const res = await request(server)
-      .get('/api/user')
-      .set('x-auth-token', token)
+    const res = await request(app).get('/api/user').set('x-auth-token', token)
 
     expect(res.status).toEqual(200)
     expect(res.body).toBeDefined()
@@ -404,14 +399,12 @@ describe('GET /api/user', () => {
     done()
   })
 
-  it('returns 404 if the id from token payload is invalid', async (done) => {
+  it('returns 400 if the id from token payload is invalid', async (done) => {
     const token = await UserService.createAuthToken(Types.ObjectId().toString())
 
     if (token === undefined) throw new Error('No token')
 
-    const res = await request(server)
-      .get('/api/user')
-      .set('x-auth-token', token)
+    const res = await request(app).get('/api/user').set('x-auth-token', token)
 
     expect(res.status).toEqual(400)
     expect(res.body.errors[0].msg).toEqual('User not found')
@@ -430,9 +423,7 @@ describe('GET /api/user', () => {
       throw new Error(errorMsg)
     })
 
-    const res = await request(server)
-      .get('/api/user')
-      .set('x-auth-token', token)
+    const res = await request(app).get('/api/user').set('x-auth-token', token)
 
     expect(res.status).toEqual(500)
     expect(res.body.errors[0].msg).toEqual(errorMsg)

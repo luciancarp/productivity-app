@@ -1,18 +1,15 @@
-import mongoose, { Schema, Types } from 'mongoose'
 import Project from '../models/Project'
 
-const createProject = async (data: {
-  title: string
-  user: Schema.Types.ObjectId
-}) => {
+const createProject = async (data: { title: string; user: string }) => {
   try {
     const newProject = {
       title: data.title,
       user: data.user,
     }
+
     const project = new Project(newProject)
 
-    project.save()
+    await project.save()
 
     return project
   } catch (error) {

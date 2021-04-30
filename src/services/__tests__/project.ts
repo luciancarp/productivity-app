@@ -11,7 +11,7 @@ describe('Project Service', () => {
   it('creates a Project', () => {
     const mockProject = {
       title: faker.lorem.word(),
-      user: new Schema.Types.ObjectId('test'),
+      user: Types.ObjectId().toString(),
     }
 
     const spy = jest
@@ -30,7 +30,7 @@ describe('Project Service', () => {
     const mockProject = {
       _id: Types.ObjectId(),
       title: faker.lorem.word(),
-      user: new Schema.Types.ObjectId('test'),
+      user: Types.ObjectId(),
     }
 
     const spy = jest
@@ -54,7 +54,7 @@ describe('Project Service', () => {
 
     const mockUpdatedProject = {
       _id: id,
-      user: new Schema.Types.ObjectId('test'),
+      user: Types.ObjectId(),
       ...mockUpdate,
     }
 
@@ -75,7 +75,7 @@ describe('Project Service', () => {
     const mockProject = {
       _id: Types.ObjectId(),
       title: faker.lorem.word(),
-      user: new Schema.Types.ObjectId('test'),
+      user: Types.ObjectId(),
     }
 
     const spy = jest
