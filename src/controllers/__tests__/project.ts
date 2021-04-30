@@ -8,6 +8,10 @@ import Project, { IProject } from '../../models/Project'
 import UserService from '../../services/user'
 import ProjectService from '../../services/project'
 import db from '../../utils/db'
+import {
+  dropAllCollections,
+  removeAllCollections,
+} from '../../utils/tests/dbUtils'
 
 let app: any
 
@@ -17,6 +21,7 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
+  await removeAllCollections()
   await db.close()
 })
 
@@ -400,5 +405,28 @@ describe('GET /api/project/user', () => {
     done()
   })
 
-  // it('returns 500 if there is a server error', async (done) => {})
+  it('returns 500 if there is a server error', async (done) => {
+    const errorMsg = 'Server error'
+
+    const testUserId = Types.ObjectId().toString()
+    const token = await UserService.createAuthToken(testUserId)
+
+    if (token === undefined) throw new Error('No token')
+
+    const spy = jest
+      .spyOn(ProjectService, 'getUserProjects')
+      .mockImplementation(() => {
+        throw new Error('mock error')
+      })
+
+    const res = await request(app)
+      .get(`/api/project/user`)
+      .set('x-auth-token', token)
+
+    expect(res.status).toEqual(500)
+    expect(res.body.errors[0].msg).toEqual(errorMsg)
+
+    spy.mockRestore()
+    done()
+  })
 })

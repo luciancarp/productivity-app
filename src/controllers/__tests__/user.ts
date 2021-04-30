@@ -10,6 +10,10 @@ import {
   authorizedTestUser,
   testUser,
 } from '../../utils/tests/testUser'
+import {
+  dropAllCollections,
+  removeAllCollections,
+} from '../../utils/tests/dbUtils'
 import User from '../../models/User'
 import UserService from '../../services/user'
 
@@ -21,6 +25,7 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
+  await removeAllCollections()
   await db.close()
 })
 
