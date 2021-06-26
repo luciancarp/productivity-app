@@ -15,6 +15,7 @@ export const createServer = (port: string) => {
   // Define Routes
   app.use('/api/user', require('../routes/api/user'))
   app.use('/api/project', require('../routes/api/project'))
+  app.use('/api/task', require('../routes/api/task'))
 
   let server = app.listen(port, () => {
     console.log(`Server started on port ${port}`)
